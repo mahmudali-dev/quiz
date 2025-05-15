@@ -1,0 +1,352 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Ilmu Pengetahuan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #d9ecff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 600px;
+      background-color: #ffffffcc;
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      padding: 30px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+      color: #2c3e50;
+    }
+
+    .subject-tag {
+      font-size: 14px;
+      background-color: #7f8c8d;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 5px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .question-number {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2980b9;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 15px;
+      margin: 15px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    button {
+      padding: 12px 25px;
+      margin: 10px 5px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: #3498db;
+      color: white;
+    }
+
+    .btn-back {
+      background-color: #f39c12;
+    }
+
+    .btn-result {
+      background-color: #e74c3c;
+    }
+
+    .btn-back:hover,
+    .btn-next:hover,
+    .btn-result:hover {
+      opacity: 0.9;
+    }
+
+    .question {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+
+    .options label {
+      display: block;
+      margin: 10px 0;
+      text-align: left;
+      font-size: 16px;
+      background-color: #ecf0f1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      transition: background-color 0.3s ease;
+    }
+
+    .options label:hover {
+      background-color: #d0dce5;
+    }
+
+    .timer {
+      font-size: 16px;
+      margin: 10px 0;
+      color: #c0392b;
+      font-weight: bold;
+    }
+
+    .page-info {
+      font-size: 14px;
+      color: #555;
+      margin-top: -15px;
+      margin-bottom: 15px;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    /* Emoji styling */
+    .emoji {
+      font-size: 24px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="quiz-container">
+    <h1>Quiz Ilmu Pengetahuan</h1>
+    <div class="subject-tag" id="subject-tag"></div>
+    <div class="question-number" id="question-number"></div>
+    <div id="content"></div>
+    <div class="page-info" id="page-info"></div>
+    <div id="navigation" style="margin-top: 20px;"></div>
+  </div>
+
+  <!-- Suara -->
+  <audio id="nextSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+  <audio id="correctSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
+  <audio id="wrongSound" src="https://www.soundjay.com/misc/sounds/buzzer-2.mp3"></audio>
+
+  <script>
+    const questions = [
+      {
+        subject: "Biologi",
+        question: "Apa organel sel yang berfungsi sebagai tempat respirasi sel?",
+        options: ["Mitokondria", "Kloroplas", "Lisosom", "Ribosom"],
+        answer: "Mitokondria",
+        image: "https://images.unsplash.com/photo-1598560244-69b7a6cfd2df?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Biologi",
+        question: "Hewan yang dapat hidup di darat dan air disebut?",
+        options: ["Reptil", "Amfibi", "Mamalia", "Ikan"],
+        answer: "Amfibi",
+        image: "https://images.unsplash.com/photo-1508610048659-a06b669d3321?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Biologi",
+        question: "Proses pembuatan makanan pada tumbuhan disebut?",
+        options: ["Respirasi", "Fotosintesis", "Transpirasi", "Sintesis"],
+        answer: "Fotosintesis",
+        image: "https://images.unsplash.com/photo-1526505112202-2d9dfaaaef9f?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Biologi",
+        question: "Apa nama ilmiah dari manusia modern?",
+        options: ["Homo erectus", "Homo sapiens", "Pan troglodytes", "Australopithecus"],
+        answer: "Homo sapiens",
+        image: "https://images.unsplash.com/photo-1573496359220-8f4e5f27c16f?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Biologi",
+        question: "Jaringan ikat cair pada tubuh manusia adalah?",
+        options: ["Otot", "Darah", "Tulang", "Saraf"],
+        answer: "Darah",
+        image: "https://images.unsplash.com/photo-1601464606958-bc19527cfc7e?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Fisika",
+        question: "Satuan dasar dari massa dalam SI adalah?",
+        options: ["Newton", "Kilogram", "Meter", "Watt"],
+        answer: "Kilogram",
+        image: "https://images.unsplash.com/photo-1603791440384-56cd371ee9a7?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Fisika",
+        question: "Gaya tarik-menarik antara dua benda disebut?",
+        options: ["Gaya listrik", "Gaya gravitasi", "Gaya gesek", "Gaya magnet"],
+        answer: "Gaya gravitasi",
+        image: "https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Fisika",
+        question: "Cahaya putih terdiri dari warna-warna yang disebut?",
+        options: ["Spektrum", "Pelangi", "Refleksi", "Refraksi"],
+        answer: "Spektrum",
+        image: "https://images.unsplash.com/photo-1599054475986-df0e58c20eda?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Fisika",
+        question: "Besaran yang memiliki nilai dan arah disebut?",
+        options: ["Skalar", "Vektor", "Massa", "Waktu"],
+        answer: "Vektor",
+        image: "https://images.unsplash.com/photo-1552674609-22137e36ffa8?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        subject: "Fisika",
+        question: "Alat ukur untuk mengukur kuat arus listrik adalah?",
+        options: ["Voltmeter", "Ohmmeter", "Amperemeter", "Barometer"],
+        answer: "Amperemeter",
+        image: "https://images.unsplash.com/photo-1581090700227-1cbcb41f1ae4?auto=format&fit=crop&w=800&q=80"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let userAnswers = [];
+    let timer;
+
+    function playNextSound() {
+      document.getElementById("nextSound").play();
+    }
+
+    function playCorrectSound() {
+      document.getElementById("correctSound").play();
+    }
+
+    function playWrongSound() {
+      document.getElementById("wrongSound").play();
+    }
+
+    function startTimer(duration) {
+      let time = duration;
+      const timerElement = document.getElementById("timer");
+      clearInterval(timer);
+      timer = setInterval(() => {
+        if (time > 0) {
+          timerElement.textContent = `Waktu tersisa: ${--time} detik`;
+        } else {
+          clearInterval(timer);
+          handleNext();
+        }
+      }, 1000);
+    }
+
+    function updatePageInfo() {
+      document.getElementById("page-info").textContent = `Soal ${currentQuestion + 1} dari ${questions.length}`;
+      document.getElementById("subject-tag").textContent = questions[currentQuestion].subject;
+      document.getElementById("question-number").innerHTML = `Nomor Soal: ${currentQuestion + 1}`;
+    }
+
+    function showQuestion(index) {
+      const container = document.getElementById("content");
+      const nav = document.getElementById("navigation");
+      const q = questions[index];
+      container.innerHTML = `
+        <img src="${q.image}" alt="Gambar soal">
+        <div class="question">${q.question}</div>
+        <div class="timer" id="timer">Waktu tersisa: 30 detik</div>
+        <div class="options">
+          ${q.options.map((opt, i) => `
+            <label><input type="radio" name="answer" value="${opt}"> (${String.fromCharCode(65 + i)}) ${opt}</label><br/>
+          `).join('')}
+        </div>
+      `;
+      nav.innerHTML = `
+        <button class="btn-back" onclick="prevQuestion()" ${index === 0 ? 'disabled' : ''}>⬅️ Kembali</button>
+        <button class="btn-next" onclick="handleNext()">Selanjutnya ➡️</button>
+      `;
+      updatePageInfo();
+      startTimer(30);
+    }
+
+    function handleNext() {
+      saveAnswer();
+      playNextSound();
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        showQuestion(currentQuestion);
+      } else {
+        showResult();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestion > 0) {
+        saveAnswer();
+        currentQuestion--;
+        showQuestion(currentQuestion);
+      }
+    }
+
+    function saveAnswer() {
+      const selected = document.querySelector('input[name="answer"]:checked');
+      userAnswers[currentQuestion] = selected ? selected.value : null;
+    }
+
+    function showResult() {
+      clearInterval(timer);
+      const container = document.getElementById("content");
+      const nav = document.getElementById("navigation");
+      let correct = 0;
+      let resultHTML = "<h2>🎯 Hasil Akhir</h2>";
+      for (let i = 0; i < questions.length; i++) {
+        const userAns = userAnswers[i];
+        const correctAns = questions[i].answer;
+        const isCorrect = userAns === correctAns;
+        resultHTML += `<p><strong>Soal ${i+1}:</strong> ${userAns ? userAns : "Tidak dijawab"} 
+          (${correctAns}) - <span style="color:${isCorrect ? "#27ae60" : "#e74c3c"}">${isCorrect ? "✅ Benar" : "❌ Salah"}</span></p>`;
+        if (isCorrect) correct++;
+      }
+      resultHTML += `<p>🎉 Nilai Anda: ${(correct / questions.length * 100).toFixed(0)}</p>`;
+      container.innerHTML = resultHTML;
+      nav.innerHTML = `<button class="btn-result" onclick="location.reload()">🔁 Mulai Ulang</button>`;
+      document.getElementById("page-info").textContent = "";
+      document.getElementById("subject-tag").textContent = "";
+      document.getElementById("question-number").textContent = "";
+
+      if (correct >= questions.length / 2) {
+        playCorrectSound();
+      } else {
+        playWrongSound();
+      }
+    }
+
+    showQuestion(currentQuestion);
+  </script>
+</body>
+</html>
+```
